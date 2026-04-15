@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Invitation à l'événement {{ invitation.event.category }}</title>
+</head>
+<body>
+    <h1>Invitation à l'événement {{ invitation.event.name }}</h1>
+    <p>Cher(e) {{ invitation.name }},</p>
+    <p>Vous êtes cordialement invité(e) à l'événement {{ invitation.event.category }} qui aura lieu le {{ invitation.event.date }} à {{ invitation.event.ville }}.</p>
+    <p>Votre code d'invitation est : {{ invitation.code_invit }}. Veuillez présenter ce code à l'entrée de l'événement.</p>
+    <p>Nous espérons vous voir à l'événement !</p>
+    <p>Cordialement,</p>
+    <p>L'équipe d'organisation de l'événement</p>
+</body>
+</html>
