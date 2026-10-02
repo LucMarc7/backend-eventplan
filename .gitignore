@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Virtualenv
+venv/
+env/
+.venv/
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3.backup*
+staticfiles/
+static/
+media/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backups
+*.backup
+*.backup-*
+*.old
+*.sauvegarde
+
+# Migrations (optionnel - à retirer si vous voulez les versionner)
+# */migrations/*.pyc
