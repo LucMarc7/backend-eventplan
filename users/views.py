@@ -3,6 +3,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.views import APIView
+from rest_framework import generics
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from .serializers import (
     RegisterSerializer,
@@ -10,22 +13,21 @@ from .serializers import (
     ChangePasswordSerializer,
     PasswordResetRequestSerializer,
     PasswordResetConfirmSerializer,
+    AvatarUploadSerializer,
+    LoginSerializer,
 )
 from .models import UserProfile
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-
-from .serializers import LoginSerializer
 
 # Imports pour désactiver CSRF
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
 
-# Create your views here.
+# ==================== VUES EXISTANTES (INCHANGÉES) ====================
 
 @method_decorator(csrf_exempt, name='dispatch')
 class LoginView(APIView):
@@ -249,3 +251,44 @@ class PasswordResetConfirmView(APIView):
                 status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ================== NOUVELLES VUES POUR LE PROFIL (AJOUT) ==================
+
+class UserProfileView(generics.RetrieveUpdateAPIView):
+    """
+    Vue pour récupérer (GET) et mettre à jour (PATCH) le profil utilisateur.
+    Correspond à l'endpoint /auth/profile/me/
+    """
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        # Récupère le profil de l'utilisateur connecté
+        return self.request.user.profile
+
+
+class AvatarUploadView(APIView):
+    """
+    Vue pour uploader (POST) et supprimer (DELETE) l'avatar.
+    Correspond à l'endpoint /auth/profile/avatar/
+    """
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request):
+        serializer = AvatarUploadSerializer(data=request.data)
+        if serializer.is_valid():
+            avatar = serializer.validated_data['avatar']
+            profile = request.user.profile
+            profile.profile_image = avatar
+            profile.save()
+            return Response({'avatar': profile.profile_image.url}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        profile = request.user.profile
+        if profile.profile_image:
+            profile.profile_image.delete(save=True)
+            return Response({'detail': 'Avatar supprimé avec succès'}, status=status.HTTP_200_OK)
+        return Response({'detail': 'Aucun avatar à supprimer'}, status=status.HTTP_400_BAD_REQUEST)

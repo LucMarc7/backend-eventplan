@@ -44,7 +44,11 @@ urlpatterns = [
     path('invitations/', include('invitations.urls')),
     path('controles/', include('controles.urls')),
     path('api-auth/', include('rest_framework.urls')),
-    path('accounts/', include('users.urls')),
+    path('accounts/', include('users.urls')),   # ← conserve la ligne existante
+
+    # ========== AJOUT POUR LE PROFIL (sous /auth/) ==========
+    # Permet d'accéder aux mêmes endpoints via /auth/ (plus cohérent avec le frontend)
+    path('auth/', include('users.urls')),
 
     # Docs Route
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
